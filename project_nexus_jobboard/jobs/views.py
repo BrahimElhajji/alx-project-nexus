@@ -23,6 +23,7 @@ def ping(request):
 class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated, IsEmployer]
 
 # JobPost CRUD for employers
 class JobPostCreateView(generics.CreateAPIView):
@@ -70,3 +71,11 @@ class EmployerApplicationsView(generics.ListAPIView):
 
     def get_queryset(self):
         return Application.objects.filter(job__employer=self.request.user).select_related('applicant', 'job')
+
+# Job seeker viewing their applications
+class SeekerApplicationsView(generics.ListAPIView):
+    serializer_class = ApplicationSerializer
+    permission_classes = [IsAuthenticated, IsJobSeeker]
+
+    def get_queryset(self):
+        return Application.objects.filter(applicant=self.request.user).select_related('job')
