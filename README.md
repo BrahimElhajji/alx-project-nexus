@@ -151,3 +151,148 @@ alx-project-nexus/
 │   ├── caching.md             # ⚡ Redis caching strategies
 │   └── ci_cd.md               # 🚀 GitHub Actions setup
 └── references/                # 📚 External links, bookmarks, code snippets
+```
+---
+
+# Nexus Job Board Backend
+
+## Overview
+This is the backend for the Job Board platform built for Project Nexus (ProDev BE). Features include:
+- Role-based JWT authentication (employers vs job seekers)
+- Job posting & categorization
+- Job applications
+- Swagger/OpenAPI interactive documentation
+- Optimized queries (`select_related`) and future-ready indexing
+
+---
+
+## Quick Start (with Docker)
+
+```bash
+# Build and bring up containers
+docker-compose build
+docker-compose up -d
+
+# Apply migrations (if not already done)
+docker-compose exec web python3 manage.py makemigrations
+docker-compose exec web python3 manage.py migrate
+```
+## Authentication Flow
+### 1. Register a user
+
+#### Job seeker:
+```bash
+curl -X POST http://localhost:8000/api/users/register/ \
+  -H "Content-Type: application/json" \
+  -d '{"username":"seeker_example","password":"StrongPass123","email":"s@example.com","is_job_seeker":true}'
+```
+
+#### Employer:
+```bash
+curl -X POST http://localhost:8000/api/users/register/ \
+  -H "Content-Type: application/json" \
+  -d '{"username":"employer_example","password":"StrongPass123","email":"e@example.com","is_employer":true}'
+```
+### 2. Obtain JWT tokens
+```bash
+curl -X POST http://localhost:8000/api/token/ \
+  -H "Content-Type: application/json" \
+  -d '{"username":"seeker_example","password":"StrongPass123"}'
+```
+#### Response:
+```json
+{
+  "refresh": "<refresh_token>",
+  "access": "<access_token>"
+}
+```
+
+### 3. Use access token in requests
+Set header:
+
+```makefile
+Authorization: Bearer <access_token>
+```
+#### Example: get seeker’s applications
+
+```bash
+curl -X GET http://localhost:8000/api/applications/seeker/ \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Accept: application/json"
+```
+---
+
+## Core API Examples
+### Create Category (employer or admin)
+```bash
+curl -X POST http://localhost:8000/api/categories/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <employer_access_token>" \
+  -d '{"name":"Backend","slug":"backend"}'
+```
+### List Categories
+```bash
+curl http://localhost:8000/api/categories/
+```
+
+### Create Job (employer)
+```bash
+curl -X POST http://localhost:8000/api/jobs/create/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <employer_access_token>" \
+  -d '{
+    "title":"Backend Engineer",
+    "description":"Build scalable REST APIs with Django.",
+    "company_name":"NexusCorp",
+    "location":"Remote",
+    "employment_type":"full_time",
+    "category": 1
+  }'
+```
+
+### List Jobs (with search / ordering)
+```bash
+curl "http://localhost:8000/api/jobs/?search=Backend&ordering=created_at"
+```
+### Apply to a Job (job seeker)
+```bash
+curl -X POST http://localhost:8000/api/applications/apply/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <seeker_access_token>" \
+  -d '{
+    "job": 1,
+    "cover_letter": "I am very interested in this role.",
+    "resume_url": "https://example.com/resume.pdf"
+  }'
+```
+### Employer view applications
+```bash
+curl -X GET http://localhost:8000/api/applications/employer/ \
+  -H "Authorization: Bearer <employer_access_token>" \
+  -H "Accept: application/json"
+```
+
+---
+
+## Swagger / OpenAPI Docs
+### Interactive docs are available at:
+
+#### Swagger UI: http://localhost:8000/api/docs/
+
+#### Raw schema: http://localhost:8000/api/docs/swagger.json
+
+#### ReDoc: http://localhost:8000/api/docs/redoc/
+
+### Using JWT in Swagger
+#### 1. Click Authorize in the UI.
+
+#### 2. In the value field enter:
+
+```php-template
+Bearer <access_token>
+```
+Example:
+```nginx
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+#### 3. Close the modal and use “Try it out” for protected endpoints.
