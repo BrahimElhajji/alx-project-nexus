@@ -32,10 +32,14 @@ ALLOWED_HOSTS = ['*']
 AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
-        'DEFAULT_AUTHENTICATION_CLASSES': (
-            'rest_framework_simplejwt.authentication.JWTAuthentication',
-            ),
-        }
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -48,6 +52,7 @@ INSTALLED_APPS = [
 	'rest_framework',
 	'users',
 	'jobs',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -79,6 +84,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'nexus_backend.wsgi.application'
 
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": 'JWT Authorization header using the Bearer scheme. Example: "Authorization: Bearer <access_token>"',
+        }
+    },
+    "USE_SESSION_AUTH": False,
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

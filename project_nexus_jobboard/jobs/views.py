@@ -37,7 +37,7 @@ class JobPostCreateView(generics.CreateAPIView):
 class JobPostListView(generics.ListAPIView):
     queryset = JobPost.objects.select_related('category', 'employer').all()
     serializer_class = JobPostSerializer
-    filter_backends = ['filters.SearchFilter', 'filters.OrderingFilter']
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'company_name', 'location', 'category__name']
     ordering_fields = ['created_at', 'title']
 
