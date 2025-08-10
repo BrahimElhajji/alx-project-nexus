@@ -186,3 +186,15 @@ else:
     X_FRAME_OPTIONS = 'DENY'
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Force HTTPS in production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    USE_TLS = True
+                
+# Fix Swagger HTTPS issue
+SWAGGER_SETTINGS.update({
+    'SCHEMES': ['https', 'http'],
+    'DEFAULT_API_URL': 'https://alx-project-nexus-production-4d2e.up.railway.app',
+    })
