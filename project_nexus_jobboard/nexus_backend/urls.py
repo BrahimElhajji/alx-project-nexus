@@ -21,6 +21,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from users.views import SignupView, CurrentUserView
+from django.http import HttpResponse
 
 schema_view = get_schema_view(
    openapi.Info(
