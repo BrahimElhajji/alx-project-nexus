@@ -1,6 +1,6 @@
-
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from django.conf import settings
 from .models import Application, Notification
 
 @receiver(pre_save, sender=Application)
@@ -18,7 +18,6 @@ def _capture_old_application_status(sender, instance, **kwargs):
     else:
         instance._old_status = None
 
-
 @receiver(post_save, sender=Application)
 def create_notifications_on_application_events(sender, instance, created, **kwargs):
     """
@@ -30,7 +29,8 @@ def create_notifications_on_application_events(sender, instance, created, **kwar
         employer = instance.job.employer
         applicant = instance.applicant
         message = f"New application from {applicant.username} for '{instance.job.title}'."
-        url = f"/api/applications/{instance.pk}/"  # frontend or API url
+        # Use relative URL instead of hardcoded localhost
+        url = f"/api/applications/{instance.pk}/"
         Notification.objects.create(user=employer, message=message, url=url)
         return
 
