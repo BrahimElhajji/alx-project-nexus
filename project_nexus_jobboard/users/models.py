@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 class User(AbstractUser):
     is_employer = models.BooleanField(default=False)
     is_job_seeker = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
 
     groups = models.ManyToManyField(
         Group,

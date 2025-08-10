@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import Category, JobPost, Application
+from .models import Category, JobPost, Application, Notification
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,8 +52,32 @@ class ApplicationSerializer(serializers.ModelSerializer):
             'status',
             'applied_at',
         ]
+        read_only_fields = ["id", "job", "job_seeker", "created_at"]
 
 class ApplicationCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
-        fields = ['job', 'cover_letter', 'resume_url']
+        fields = ['job', 'cover_letter', 'resume_url', 'status']
+
+        def validate_status(self, value):
+            valid_choices = [choice[0] for choice in Application.STATUS_CHOICES]
+            if value not in valid_choices:
+                raise serializers.ValidationError(f"Invalid status '{value}'. Must be one of {valid_choices}.")
+            return value
+
+class ApplicationStatusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Application
+        fields = ['status']
+
+    def validate_status(self, value):
+        valid_choices = [choice[0] for choice in Application.STATUS_CHOICES]
+        if value not in valid_choices:
+            raise serializers.ValidationError(f"Invalid status '{value}'. Must be one of {valid_choices}.")
+        return value
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'message', 'url', 'is_read', 'created_at']
+        read_only_fields = ['id', 'message', 'url', 'created_at']

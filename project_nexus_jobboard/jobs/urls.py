@@ -9,7 +9,12 @@ from .views import (
     ApplyJobView,
     EmployerApplicationsView,
     SeekerApplicationsView,
+    ApplicationStatusUpdateView,
+    NotificationListView,
+    NotificationMarkReadView,
+    NotificationUnreadCountView
 )
+from . import views
 
 urlpatterns = [
     path('ping/', ping, name='ping'),
@@ -20,4 +25,8 @@ urlpatterns = [
     path('applications/apply/', ApplyJobView.as_view(), name='apply-job'),
     path('applications/employer/', EmployerApplicationsView.as_view(), name='employer-apps'),
     path('applications/seeker/', SeekerApplicationsView.as_view(), name='seeker-apps'),
+    path('applications/<int:pk>/status/', ApplicationStatusUpdateView.as_view(), name='application-status-update'),
+    path('notifications/', NotificationListView.as_view(), name='notifications-list'),
+    path('notifications/<int:pk>/read/', NotificationMarkReadView.as_view(), name='notification-mark-read'),
+    path('notifications/unread_count/', NotificationUnreadCountView.as_view(), name='notifications-unread-count'),
 ]

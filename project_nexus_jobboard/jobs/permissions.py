@@ -1,5 +1,11 @@
 
 from rest_framework import permissions
+from rest_framework.permissions import BasePermission
+
+class IsEmployerOfJobApplication(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        # Only employer who owns the job related to this application can update status
+        return request.user == obj.job.employer
 
 class IsEmployer(permissions.BasePermission):
     def has_permission(self, request, view):
