@@ -1,4 +1,4 @@
-Django>=4.2
+django>=4.2
 djangorestframework
 djangorestframework-simplejwt
 gunicorn
@@ -7,3 +7,5 @@ python-dotenv
 drf-yasg
 django-filter
 django-extensions
+dj-database-url
+whitenoise
