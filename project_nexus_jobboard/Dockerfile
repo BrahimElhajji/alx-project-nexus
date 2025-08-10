@@ -13,4 +13,4 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY . .
 
-CMD gunicorn nexus_backend.wsgi:application --bind 0.0.0.0:${PORT:-8000}
+CMD gunicorn nexus_backend.wsgi:application --bind 0.0.0.0:${PORT}
