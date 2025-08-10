@@ -1,21 +1,40 @@
 FROM python:3.10-slim
 
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
-# Copy requirements and install
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy project
+# Copy and install Python dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+
+# Copy project files
 COPY . .
 
-# Set environment variables for Railway
-ENV PYTHONUNBUFFERED=1
+# Set Django settings
 ENV DJANGO_SETTINGS_MODULE=nexus_backend.settings
 
-# Expose port
-EXPOSE 8000
+# Create staticfiles directory and collect static files
+RUN mkdir -p /app/staticfiles
+RUN python manage.py collectstatic --noinput --clear || true
 
-# Simple startup command
-CMD python manage.py migrate && python manage.py runserver 0.0.0.0:${PORT:-8000}
+# Create startup script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo "Running migrations..."\n\
+python manage.py migrate --noinput\n\
+echo "Collecting static files..."\n\
+python manage.py collectstatic --noinput --clear\n\
+echo "Starting server..."\n\
+exec gunicorn nexus_backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2' > /app/start.sh
+
+RUN chmod +x /app/start.sh
+
+CMD ["/app/start.sh"]
 
