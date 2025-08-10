@@ -1,6 +1,6 @@
 from rest_framework import generics, filters, status, permissions
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 import django_filters
@@ -22,11 +22,12 @@ from .serializers import (
 )
 from django.db.models import Count
 from .permissions import IsEmployer, IsJobSeeker, IsOwnerOrReadOnly, IsEmployerOfJobApplication
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from .pagination import StandardResultsSetPagination
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def ping(request):
     return Response({'pong': True})
 
