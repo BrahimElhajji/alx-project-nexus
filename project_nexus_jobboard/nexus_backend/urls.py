@@ -32,6 +32,10 @@ schema_view = get_schema_view(
    permission_classes=(permissions.AllowAny,),
 )
 
+def home(request):
+    return HttpResponse("Welcome to the Job Board API!")
+
+
 urlpatterns = [
     path('', home),
     path('admin/', admin.site.urls),
